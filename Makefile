@@ -1,5 +1,5 @@
 NAME = pipex
-SRCS = 
+SRCS = main.c ft_split.c ft_aux.c
 OBJS = $(SRCS:.c=.o)
 CFLAGS = -Wall -Werror -Wextra -fsanitize=address
 
