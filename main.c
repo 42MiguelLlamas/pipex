@@ -11,14 +11,20 @@ void ft_check_args(char **argv)
 const char    *ft_check_path(char **paths, char *cmd)
 {
     int i;
+    const char *aux;
+    const char *path;
 
     i = 0;
     if (access(cmd, X_OK) == 0)
         return (cmd);
     while (paths[i])
     {
-        if (access(ft_strjoin(paths[i],cmd), X_OK) == 0)
-            return(ft_strjoin(paths[i],cmd));
+        aux = ft_strjoin(paths[i], "/");
+        path = ft_strjoin(aux, cmd);
+        free((void *)aux);
+        if (access(path, X_OK) == 0)
+            return(path);
+        free((void *)path);
         i++;
     }
     write(1, "Error: Command not found\n", 25);
@@ -81,7 +87,6 @@ int main(int argc, char **argv, char **envp)
     while (ft_strncmp("PATH=", envp[i], 5) != 0)
         i++;
     paths = ft_split(envp[i] + 5, ':');
-    pipe(fd);
     if (pipe(fd) == -1)
         ft_error_exit();
     pid = fork();
