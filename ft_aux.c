@@ -1,5 +1,11 @@
 #include "pipex.h"
 
+void ft_error_exit(void)
+{
+    perror("Error");
+    exit(EXIT_FAILURE);
+}
+
 size_t	ft_strlen(const char *s)
 {
 	size_t	a;
@@ -39,6 +45,34 @@ const char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	str[i] = '\0';
 	return ((const char *)str);
+}
+
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	size_t			i;
+	unsigned char	p1;
+	unsigned char	p2;
+
+	if (n == 0)
+		return (0);
+	i = 0;
+	while (i < n && s1[i])
+	{
+		p1 = (unsigned char )s1[i];
+		p2 = (unsigned char )s2[i];
+		if (p1 > p2)
+			return (1);
+		if (p1 < p2)
+			return (-1);
+		i++;
+	}
+	if (i == n)
+		return (0);
+	if (s1[i])
+		return (1);
+	else if (s2[i])
+		return (-1);
+	return (0);
 }
 
 void ft_free(char **array)
