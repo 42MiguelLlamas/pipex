@@ -37,13 +37,12 @@ void ft_son(int *fd, char **argv, char **paths)
     const char      *path;
     int             ex;
 
-    entrada = open(argv[1], O_WRONLY);
+    entrada = open(argv[1], O_RDONLY);
     cmd1 = ft_split(argv[2], ' ');
     path = ft_check_path(paths, cmd1[0]);
-    close(fd[0]);
-    dup2(entrada, STDIN_FILENO);
     dup2(fd[1], STDOUT_FILENO);
-    close(fd[1]);
+    dup2(entrada, STDIN_FILENO);
+    close(fd[0]);
     ex = execve(path, cmd1, NULL);
     ft_free(cmd1);
     free((void *)path);
@@ -61,10 +60,9 @@ void ft_parent(int *fd, char **argv, char **paths)
     salida = open(argv[4], O_WRONLY);
     cmd2 = ft_split(argv[3], ' ');
     path = ft_check_path(paths, cmd2[0]);
-    close(fd[1]);
     dup2(fd[0], STDIN_FILENO);
     dup2(salida, STDOUT_FILENO);
-    close(fd[0]);
+    close(fd[1]);
     ex = execve(path, cmd2, NULL);
     ft_free(cmd2);
     free((void *)path);
@@ -90,9 +88,9 @@ int main(int argc, char **argv, char **envp)
     if (pipe(fd) == -1)
         ft_error_exit();
     pid = fork();
-    if (pid == -1)
+    if (pid < 0)
         ft_error_exit();
-    if (pid == 0)
+    else if (pid == 0)
         ft_son(fd, argv, paths);
     else
         ft_parent(fd, argv, paths);
