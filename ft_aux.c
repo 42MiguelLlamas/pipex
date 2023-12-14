@@ -1,7 +1,8 @@
 #include "pipex.h"
 
-void ft_error_exit(void)
+void ft_error_exit(char **array)
 {
+	ft_free(array);
     perror("Error");
     exit(EXIT_FAILURE);
 }

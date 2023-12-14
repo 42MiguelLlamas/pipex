@@ -3,9 +3,15 @@
 void ft_check_args(char **argv)
 {
     if (access(argv[1], R_OK == -1))
-        ft_error_exit();
+    {
+        perror("Error");
+        exit(EXIT_FAILURE);
+    }
     if (access(argv[4], W_OK == -1))
-        ft_error_exit();
+    {
+        perror("Error");
+        exit(EXIT_FAILURE);
+    }
 }
 
 const char    *ft_check_path(char **paths, char *cmd)
@@ -28,6 +34,7 @@ const char    *ft_check_path(char **paths, char *cmd)
         i++;
     }
     write(1, "Error: Command not found\n", 25);
+    ft_free(paths);
     exit(EXIT_FAILURE);
 }
 void ft_son(int *fd, char **argv, char **paths)
@@ -47,7 +54,7 @@ void ft_son(int *fd, char **argv, char **paths)
     ft_free(cmd1);
     free((void *)path);
     if (ex == -1)
-        ft_error_exit();
+        ft_error_exit(paths);
 }
 
 void ft_parent(int *fd, char **argv, char **paths)
@@ -67,7 +74,7 @@ void ft_parent(int *fd, char **argv, char **paths)
     ft_free(cmd2);
     free((void *)path);
     if (ex == -1)
-        ft_error_exit();
+        ft_error_exit(paths);
 }
 
 int main(int argc, char **argv, char **envp) 
@@ -86,10 +93,10 @@ int main(int argc, char **argv, char **envp)
         i++;
     paths = ft_split(envp[i] + 5, ':');
     if (pipe(fd) == -1)
-        ft_error_exit();
+        ft_error_exit(paths);
     pid = fork();
     if (pid < 0)
-        ft_error_exit();
+        ft_error_exit(paths);
     else if (pid == 0)
         ft_son(fd, argv, paths);
     else
