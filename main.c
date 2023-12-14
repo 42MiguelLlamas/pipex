@@ -24,7 +24,6 @@ void ft_son(int *fd, char **argv)
     entrada = open(argv[1], O_WRONLY);
     cmd1 = ft_split(argv[2], ' ');
     path = ft_strjoin("/bin/", cmd1[0]);
-    close(fd[0]);
     dup2(entrada, STDIN_FILENO);
     dup2(fd[1], STDOUT_FILENO);
     close(fd[1]);
@@ -45,10 +44,9 @@ void ft_parent(int *fd, char **argv)
     salida = open(argv[4], O_WRONLY);
     cmd2 = ft_split(argv[3], ' ');
     path = ft_strjoin("/bin/", cmd2[0]);
-    close(fd[1]);
     dup2(fd[0], STDIN_FILENO);
-    close(fd[0]);
     dup2(salida, STDOUT_FILENO);
+    close(fd[0]);
     ex = execve(path, cmd2, NULL);
     ft_free(cmd2);
     free((void *)path);
@@ -64,6 +62,7 @@ int main(int argc, char **argv)
 
     if (argc != 5)
 		return (0);
+    printf("%s\n", "Aquí:");
     ft_check(argv);
     pipe(fd);
     if (pipe(fd) == -1)
