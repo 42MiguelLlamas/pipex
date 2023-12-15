@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_aux.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mllamas- <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/12/15 11:44:18 by mllamas-          #+#    #+#             */
+/*   Updated: 2023/12/15 11:58:17 by mllamas-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
-void ft_error_exit(char **array)
+void	ft_error_exit(char **array)
 {
 	ft_free(array);
-    perror("Error");
-    exit(EXIT_FAILURE);
+	perror("Error");
+	exit(EXIT_FAILURE);
 }
 
 size_t	ft_strlen(const char *s)
@@ -76,15 +88,15 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	return (0);
 }
 
-void ft_free(char **array)
+void	ft_free(char **array)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while (array[i])
-    {
-        free(array[i]);
-        i++;
-    }
-    free(array);
+	i = 0;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
 }
