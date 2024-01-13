@@ -12,18 +12,28 @@
 
 #include "pipex.h"
 
-void	ft_check_args(char **argv)
+char	**ft_check_args(int argc, char **argv, char **envp)
 {
-	if (access(argv[1], R_OK == -1))
+	int		i;
+	char	**paths;
+
+	if (argc != 5)
+		exit (EXIT_FAILURE);
+	if (access(argv[1], R_OK) == -1))
 	{
 		perror("Error");
 		exit(EXIT_FAILURE);
 	}
-	if (access(argv[4], W_OK == -1))
+	if (access(argv[4], W_OK) == -1))
 	{
 		perror("Error");
 		exit(EXIT_FAILURE);
 	}
+	i = 0;
+	while (ft_strncmp("PATH=", envp[i], 5) != 0)
+		i++;
+	paths = ft_split(envp[i] + 5, ':');
+	return (paths);
 }
 
 const char	*ft_check_path(char **paths, char *cmd)
@@ -63,6 +73,8 @@ void	ft_son(int *fd, char **argv, char **paths)
 	dup2(fd[1], STDOUT_FILENO);
 	dup2(entrada, STDIN_FILENO);
 	close(fd[0]);
+	close(fd[1]);
+	close(entrada);
 	ex = execve(path, cmd1, NULL);
 	ft_free(cmd1);
 	free((void *)path);
@@ -70,19 +82,21 @@ void	ft_son(int *fd, char **argv, char **paths)
 		ft_error_exit(paths);
 }
 
-void	ft_parent(int *fd, char **argv, char **paths)
+void	ft_son2(int *fd, char **argv, char **paths)
 {
 	int			salida;
 	char		**cmd2;
-	int			ex;
 	const char	*path;
+	int			ex;
 
-	salida = open(argv[4], O_WRONLY);
+	salida = open(argv[4], O_WRONLY | O_CREAT, 0644);
 	cmd2 = ft_split(argv[3], ' ');
 	path = ft_check_path(paths, cmd2[0]);
 	dup2(fd[0], STDIN_FILENO);
 	dup2(salida, STDOUT_FILENO);
+	close(fd[0]);
 	close(fd[1]);
+	close(salida);
 	ex = execve(path, cmd2, NULL);
 	ft_free(cmd2);
 	free((void *)path);
@@ -94,24 +108,25 @@ int	main(int argc, char **argv, char **envp)
 {
 	int		fd[2];
 	int		pid;
-	int		i;
+	int		pid2;
 	char	**paths;
 
-	if (argc != 5)
-		return (0);
-	ft_check_args(argv);
-	i = 0;
-	while (ft_strncmp("PATH=", envp[i], 5) != 0)
-		i++;
-	paths = ft_split(envp[i] + 5, ':');
+	paths = ft_check_args(argc, argv, envp);
 	if (pipe(fd) == -1)
 		ft_error_exit(paths);
 	pid = fork();
 	if (pid < 0)
 		ft_error_exit(paths);
-	else if (pid == 0)
+	if (pid == 0)
 		ft_son(fd, argv, paths);
+	pid2 = fork();
+	if (pid2 < 0)
+		ft_error_exit(paths);
+	if (pid2 == 0)
+		ft_son2(fd, argv, paths);
+	close(fd[0]);
+	close(fd[1]);
 	waitpid(pid, NULL, 0);
-	ft_parent(fd, argv, paths);
+	waitpid(pid2, NULL, 0);
 	return (0);
 }
