@@ -1,0 +1,11 @@
+Makefile
+a
+b
+ft_aux.c
+ft_aux.o
+ft_split.c
+ft_split.o
+main.c
+main.o
+pipex
+pipex.h

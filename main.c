@@ -6,7 +6,7 @@
 /*   By: mllamas- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 11:44:45 by mllamas-          #+#    #+#             */
-/*   Updated: 2023/12/15 11:55:40 by mllamas-         ###   ########.fr       */
+/*   Updated: 2024/01/21 12:07:20 by mllamas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,19 +19,18 @@ char	**ft_check_args(int argc, char **argv, char **envp)
 
 	if (argc != 5)
 		exit (EXIT_FAILURE);
-	if (access(argv[1], R_OK) == -1))
-	{
-		perror("Error");
-		exit(EXIT_FAILURE);
-	}
-	if (access(argv[4], W_OK) == -1))
+	if (access(argv[1], R_OK) == -1)
 	{
 		perror("Error");
 		exit(EXIT_FAILURE);
 	}
 	i = 0;
-	while (ft_strncmp("PATH=", envp[i], 5) != 0)
+	while (envp[i] != NULL)
+	{
+		if (ft_strncmp("PATH=", envp[i], 5) == 0)
+			break ;
 		i++;
+	}
 	paths = ft_split(envp[i] + 5, ':');
 	return (paths);
 }
@@ -43,8 +42,6 @@ const char	*ft_check_path(char **paths, char *cmd)
 	const char	*path;
 
 	i = 0;
-	if (access(cmd, X_OK) == 0)
-		return (cmd);
 	while (paths[i])
 	{
 		aux = ft_strjoin(paths[i], "/");
@@ -54,6 +51,10 @@ const char	*ft_check_path(char **paths, char *cmd)
 			return (path);
 		free((void *)path);
 		i++;
+	}
+	if (access(cmd, X_OK) == 0)
+	{
+		return (cmd);
 	}
 	write(1, "Error: Command not found\n", 25);
 	ft_free(paths);
@@ -89,7 +90,7 @@ void	ft_son2(int *fd, char **argv, char **paths)
 	const char	*path;
 	int			ex;
 
-	salida = open(argv[4], O_WRONLY | O_CREAT, 0644);
+	salida = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	cmd2 = ft_split(argv[3], ' ');
 	path = ft_check_path(paths, cmd2[0]);
 	dup2(fd[0], STDIN_FILENO);
