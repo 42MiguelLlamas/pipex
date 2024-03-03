@@ -16,7 +16,7 @@ void	ft_error_exit(char **array)
 {
 	ft_free(array);
 	perror("Error");
-	exit(EXIT_FAILURE);
+	exit(127);
 }
 
 size_t	ft_strlen(const char *s)

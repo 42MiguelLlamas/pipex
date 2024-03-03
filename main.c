@@ -12,7 +12,7 @@
 
 #include "pipex.h"
 
-char	**ft_check_args(int argc, char **argv, char **envp)
+char	**ft_check_args(int argc, char **argv, char **env)
 {
 	int		i;
 	char	**paths;
@@ -25,13 +25,15 @@ char	**ft_check_args(int argc, char **argv, char **envp)
 		exit(EXIT_FAILURE);
 	}
 	i = 0;
-	while (envp[i] != NULL)
+	while (env[i] != NULL)
 	{
-		if (ft_strncmp("PATH=", envp[i], 5) == 0)
+		if (ft_strncmp("PATH=", env[i], 5) == 0)
 			break ;
 		i++;
 	}
-	paths = ft_split(envp[i] + 5, ':');
+	if (env[i] == NULL)
+		return (NULL);
+	paths = ft_split(env[i] + 5, ':');
 	return (paths);
 }
 
@@ -42,8 +44,9 @@ const char	*ft_check_path(char **paths, char *cmd)
 	const char	*path;
 
 	i = 0;
-	while (paths[i])
+	while (paths[i] && paths[i] != NULL)
 	{
+		printf("Paths[i]:  %s \n", paths[i]);
 		aux = ft_strjoin(paths[i], "/");
 		path = ft_strjoin(aux, cmd);
 		free((void *)aux);
@@ -70,7 +73,10 @@ void	ft_son(int *fd, char **argv, char **paths)
 
 	entrada = open(argv[1], O_RDONLY);
 	cmd1 = ft_split(argv[2], ' ');
-	path = ft_check_path(paths, cmd1[0]);
+	if (paths == NULL)
+		path = cmd1[0];
+	else
+		path = ft_check_path(paths, cmd1[0]);
 	dup2(fd[1], STDOUT_FILENO);
 	dup2(entrada, STDIN_FILENO);
 	close(fd[0]);
@@ -92,7 +98,10 @@ void	ft_son2(int *fd, char **argv, char **paths)
 
 	salida = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	cmd2 = ft_split(argv[3], ' ');
-	path = ft_check_path(paths, cmd2[0]);
+	if (paths == NULL)
+		path = cmd2[0];
+	else
+		path = ft_check_path(paths, cmd2[0]);
 	dup2(fd[0], STDIN_FILENO);
 	dup2(salida, STDOUT_FILENO);
 	close(fd[0]);
@@ -105,14 +114,14 @@ void	ft_son2(int *fd, char **argv, char **paths)
 		ft_error_exit(paths);
 }
 
-int	main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **env)
 {
 	int		fd[2];
 	int		pid;
 	int		pid2;
 	char	**paths;
 
-	paths = ft_check_args(argc, argv, envp);
+	paths = ft_check_args(argc, argv, env);
 	if (pipe(fd) == -1)
 		ft_error_exit(paths);
 	pid = fork();
