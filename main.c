@@ -46,7 +46,6 @@ const char	*ft_check_path(char **paths, char *cmd)
 	i = 0;
 	while (paths[i] && paths[i] != NULL)
 	{
-		printf("Paths[i]:  %s \n", paths[i]);
 		aux = ft_strjoin(paths[i], "/");
 		path = ft_strjoin(aux, cmd);
 		free((void *)aux);
